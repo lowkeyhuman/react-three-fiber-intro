@@ -6,7 +6,8 @@ function App() {
 
   return (
     <>
-      <Canvas >
+      <Canvas 
+        flat>
         <Experience />
       </Canvas>
     </>
