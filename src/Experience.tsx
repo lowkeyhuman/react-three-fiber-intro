@@ -1,9 +1,21 @@
-import { CameraControls, OrthographicCamera } from "@react-three/drei";
+import { CameraControls, OrthographicCamera, useGLTF, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react"
 import { Mesh } from 'three';
+import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+type GLTFResult = GLTF & {
+  nodes: {
+    baked: THREE.Mesh;
+  }
+}
 
 const Experience = () => {
+  
+  const model = useGLTF('./scene.glb') as GLTFResult;
+  const bakedTexture = useTexture('./baked.jpg');
+  bakedTexture.flipY = false;
+
   const boxRef = useRef<Mesh>(null);
 
   useFrame((_, delta) => {
@@ -27,6 +39,10 @@ const Experience = () => {
         position={[0, 3, 6]}
       />
       <CameraControls makeDefault />
+
+      <mesh geometry={ model.nodes.baked.geometry }>
+        <meshBasicMaterial map={ bakedTexture } />
+      </mesh>
     </>
   )
 }
