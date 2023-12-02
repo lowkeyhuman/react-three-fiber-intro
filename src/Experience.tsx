@@ -1,48 +1,63 @@
-import { CameraControls, OrthographicCamera, useGLTF, useTexture } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react"
-import { Mesh } from 'three';
+import { OrbitControls, PerspectiveCamera, Sparkles, useGLTF, useTexture } from "@react-three/drei";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 type GLTFResult = GLTF & {
   nodes: {
     baked: THREE.Mesh;
+    poleLight1: THREE.Mesh;
+    poleLight2: THREE.Mesh;
+    portalLight: THREE.Mesh;
   }
 }
 
 const Experience = () => {
-  
-  const model = useGLTF('./scene.glb') as GLTFResult;
+  const { nodes } = useGLTF('./scene.glb') as GLTFResult;
+
   const bakedTexture = useTexture('./baked.jpg');
   bakedTexture.flipY = false;
 
-  const boxRef = useRef<Mesh>(null);
-
-  useFrame((_, delta) => {
-    const box = boxRef.current;
-    if (box == null) return;
-
-    box.rotation.y += 0.2 * delta 
-  })
-
   return (
     <>
-      <mesh ref={boxRef}>
-        <boxGeometry />
-        <meshNormalMaterial />
-      </mesh>
+      <color args={['#000']} attach={'background'} />
 
-      <ambientLight />
-      <OrthographicCamera 
+      <PerspectiveCamera 
         makeDefault
-        zoom={250}
-        position={[0, 3, 6]}
+        position={[-3, 2, 5]}
       />
-      <CameraControls makeDefault />
+      <OrbitControls makeDefault />
 
-      <mesh geometry={ model.nodes.baked.geometry }>
+      <mesh geometry={ nodes.baked.geometry }>
         <meshBasicMaterial map={ bakedTexture } />
       </mesh>
+
+      <mesh 
+        geometry={ nodes.poleLight1.geometry }
+        position={ nodes.poleLight1.position }
+      >
+        <meshBasicMaterial color='#ffffff' />
+      </mesh>
+
+      <mesh 
+        geometry={ nodes.poleLight2.geometry }
+        position={ nodes.poleLight2.position }
+      >
+        <meshBasicMaterial color='#ffffff' />
+      </mesh>
+
+      <mesh
+        geometry={ nodes.portalLight.geometry }
+        position={ nodes.portalLight.position }
+        rotation={ nodes.portalLight.rotation }
+      >
+        <meshBasicMaterial color='#ffffff' />
+      </mesh>
+
+      <Sparkles 
+        size={ 4 }
+        scale={[4, 2, 4]}
+        position={[0, 1, 0]}
+        speed={ 0.4 }
+      />
     </>
   )
 }
